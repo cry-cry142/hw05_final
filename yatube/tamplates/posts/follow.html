@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+  {% include 'posts/includes/switcher.html' %}  
+  <h1>Ваши любимые авторы</h1>
+  
+  {% include 'posts/includes/posts_list_index.html' with page_obj=page_obj %}
+  
+
+{% endblock %}

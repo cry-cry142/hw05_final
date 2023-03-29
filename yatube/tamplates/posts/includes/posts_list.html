@@ -1,0 +1,41 @@
+{% for post in page_obj %}
+  <article>
+    <ul>
+      <li>
+        Автор: 
+          {% if post.author.get_full_name %}
+            {{ post.author.get_full_name }}
+          {% else %}
+           {{ post.author.get_username }}
+          {% endif %}
+        {% block author_add %}
+          {% if post.author %}   
+            <a href={% url 'posts:profile' post.author.username %}>все посты пользователя</a>
+          {% endif %}
+        {% endblock author_add %}
+      </li>
+      <li>
+        Дата публикации: {{ post.pub_date|date:"d E Y" }}
+      </li>
+    </ul>
+    {% include 'posts/includes/post_image.html' with post=post %}
+    <p>
+      {{ post.text|truncatewords:count_words }}
+    </p>
+    {% block goto_post %}
+      <a href="{% url 'posts:post_detail' post.id %}">подробная информация </a>
+    {% endblock goto_post %}
+  </article>
+  
+  {% block posts_group %}
+    {% if post.group %}   
+      <a href="{% url 'posts:group_list' post.group.slug %}">
+        Все записи группы
+      </a>
+    {% endif %}
+  {% endblock posts_group %}
+  
+  {% if not forloop.last %}<hr>{% endif %}
+{% endfor %}
+
+{% include 'posts/includes/paginator.html' %}

@@ -1,0 +1,12 @@
+{% extends 'includes/form_block.html' %}
+
+{% block submit_block %}
+
+  <button type="submit" class="btn btn-primary">
+    Войти
+  </button>
+  <a href="{% url 'users:password_reset_form' %}" class="btn btn-link">
+    Забыли пароль?
+  </a>
+
+{% endblock submit_block %}

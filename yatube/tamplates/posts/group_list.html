@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Страница группы {{ group.title }} — Yatube
+{% endblock %}
+
+{% block content %}
+  <h1>{{ group.title }}</h1>
+  <p>
+    {{ group.description }}
+  </p>
+
+  {% for post in page_obj %}
+  <article>
+    <ul>
+      <li>
+        Автор: 
+          {% if post.author.get_full_name %}
+            {{ post.author.get_full_name }}
+          {% else %}
+           {{ post.author.get_username }}
+          {% endif %}
+        {% block author_add %}
+          {% if post.author %}   
+            <a href={% url 'posts:profile' post.author.username %}>все посты пользователя</a>
+          {% endif %}
+        {% endblock author_add %}
+      </li>
+      <li>
+        Дата публикации: {{ post.pub_date|date:"d E Y" }}
+      </li>
+    </ul>
+    {% include 'posts/includes/post_image.html' with post=post %}
+    <p>
+      {{ post.text|truncatewords:count_words }}
+    </p>
+      <a href="{% url 'posts:post_detail' post.id %}">подробная информация </a>
+  </article>
+  
+  {% if not forloop.last %}<hr>{% endif %}
+{% endfor %}
+
+{% include 'posts/includes/paginator.html' %}
+
+{% endblock %}
