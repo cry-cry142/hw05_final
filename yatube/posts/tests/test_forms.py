@@ -68,7 +68,7 @@ class PostFormTest(TestCase):
         self.assertNotEqual(last_post_after, last_post_before)
         self.assertEqual(form_data['text'], last_post_after.text)
         self.assertEqual(form_data['group'], last_post_after.group_id)
-        self.assertEqual(last_post_after.image, 'posts/small.gif')
+        self.assertEqual(f'posts/{form_data["image"]}', last_post_after.image)
 
     def test_edit_post(self):
         """Валидная форма редакитует запись в Post."""

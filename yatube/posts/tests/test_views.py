@@ -265,7 +265,7 @@ class PostPagesTests(TestCase):
         """Тестирование кеша главной страницы."""
         guest_client = Client()
         response_before = guest_client.get(reverse('posts:main'))
-        Post.objects.first().delete()
+        response_before.context['page_obj'][0].delete()
         response_after = guest_client.get(reverse('posts:main'))
 
         self.assertEqual(response_before.content, response_after.content)
@@ -282,23 +282,27 @@ class PostPagesTests(TestCase):
 
         self.assertTemplateUsed(response, 'core/404.html')
 
-    def test_followers(self):
-        """Тестирование модуля подписок."""
-        user = User.objects.create(username='TUser')
+    def test_followers_subscribe(self):
+        """Подписчики могут подписываться."""
+        user = User.objects.create(username='follower')
         user_client = Client()
         user_client.force_login(user)
         user_client.post(reverse('posts:profile_follow',
                                  args=(self.user[0].username,)))
 
-        response = user_client.get(reverse('posts:follow_index'))
-        posts = response.context['page_obj'].paginator.object_list
-        for post in posts:
-            with self.subTest(f'У поста {post} автор {post.author}'):
-                self.assertEqual(post.author, self.user[0])
-
         self.assertTrue(
             Follow.objects.filter(author=self.user[0], user=user).exists(),
             'Пользователь не может подписаться.'
+        )
+
+    def test_followers_unsubscribe(self):
+        """Подписчики могут отписываться."""
+        user = User.objects.create(username='follower')
+        user_client = Client()
+        user_client.force_login(user)
+        Follow.objects.create(
+            author=self.user[0],
+            user=user,
         )
         user_client.post(reverse('posts:profile_unfollow',
                                  args=(self.user[0].username,)))
@@ -306,3 +310,18 @@ class PostPagesTests(TestCase):
             Follow.objects.filter(author=self.user[0], user=user).exists(),
             'Пользователь не может отписаться.'
         )
+
+    def test_followers_show_correct(self):
+        """У подписчиков отображается правильный контекст."""
+        user = User.objects.create(username='follower')
+        user_client = Client()
+        user_client.force_login(user)
+        Follow.objects.create(
+            author=self.user[0],
+            user=user,
+        )
+        response = user_client.get(reverse('posts:follow_index'))
+        posts = response.context['page_obj'].paginator.object_list
+        for post in posts:
+            with self.subTest(f'У поста {post} автор {post.author}'):
+                self.assertEqual(post.author, self.user[0])

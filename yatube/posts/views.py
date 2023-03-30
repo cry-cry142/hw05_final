@@ -76,7 +76,7 @@ def post_detail(request, post_id):
     template = 'posts/post_detail.html'
     post = get_object_or_404(Post.objects.select_related(), id=post_id)
     is_read = (post.author == request.user)
-    comments_list = post.comments.all()
+    comments_list = post.comments.select_related('author').all()
     context = {
         'post': post,
         'count_chars': settings.COUNT_CHAR_POST_TITLE,
@@ -149,8 +149,7 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    authors = [obj.author for obj in request.user.follower.all()]
-    post_list = Post.objects.filter(author__in=authors)
+    post_list = Post.objects.filter(author__following__user=request.user)
     page_obj = page_pagik(request, post_list)
     context = {
         'title': 'Избранные авторы',

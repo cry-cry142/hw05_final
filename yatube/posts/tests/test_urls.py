@@ -1,11 +1,9 @@
 from http import HTTPStatus
 from django.test import TestCase, Client
-from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from ..models import Post, Group
+from ..models import Post, Group, User
 
 
-User = get_user_model()
 COUNT = 5
 
 
