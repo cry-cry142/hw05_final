@@ -28,7 +28,7 @@ def index(request):
 
 
 def group_posts(request, slug):
-    group = get_object_or_404(Group, slug=slug)
+    group = get_object_or_404(Group.objects.select_related(), slug=slug)
     template = 'posts/group_list.html'
     title = 'Здесь будет информация о группах проекта Yatube'
     name_cache = f'gr[{slug}]_post_list'
